@@ -33,7 +33,7 @@ class CORSRequestHandler (SimpleHTTPRequestHandler):
             buf = f.readline()
             f.close()
         except IOError:
-            buf = '0\t0'
+            buf = '0\t0\t0\t0'
             print "File is not accessible."
         self.protocal_version = 'HTTP/1.1'
         self.send_response(200)  

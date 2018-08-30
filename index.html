@@ -1,10 +1,15 @@
-<!---->
 <!DOCTYPE html>
-<html style="height: 100%">
+<html style="height:100%; width:100%;">
    <head>
        <meta charset="utf-8">
+	   <title>The performance of IGH</title>
+	   <style type = ></style>
    </head>
+
    <body style="height: 100%; margin: 0">
+	<input name="IP" type="text" id="IP" placeholder="Server IP" style="margin-left:10px; height: 22px; background-color:#CCC;"/>
+	<input type="submit" value="Start"  onclick="getServerIp()" style="margin-left:0px; background-color: #7ED321; width:70px;height: 30px;color: #FFFFFF"/>
+
        <div id="container" style="height: 100%"></div>
        <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
        <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-gl/echarts-gl.min.js"></script>
@@ -12,7 +17,6 @@
        <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js"></script>
        <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
        <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
-       <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ZUONbpqGBsYGXNIYHicvbAbM"></script>
        <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
        <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/simplex.js"></script>
 	   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -24,93 +28,182 @@
 		option = null;
 
 		var times = [];
-		var transmissionArr = [];
-		var cycleArr = [];
+		var transmit_openil = [];
+		var transmit_generic = [];
+		var loop_openil = [];
+		var loop_generic = [];
 		var performanceAverage = 5;
-		var Y_N = 30;
+		var Y_N = 20;
 		var X_MAX = 10;
 		var X_MIN = 0;
 
 		var transmission = 0;
 		var cycle = 0;
 		var count = 0;
+		var Url = 'http://10.192.208.166:8000/';
+		var flag = 0;
 
 		for(let i = 0; i < Y_N; i++){
 			times.push("");
 		}
 
 		option = {
-			title: [{
-				left: 'center',
-				text: 'transmissionArr Time'
-			}, {
-				top: '50%',
-				left: 'center',
-				text: 'Task Cycle'
-			}],
+			title: [
+				{
+					left: '10%',
+					top: '2%',
+					text: 'transmission Time'
+				},
+				{
+					top: '50%',
+					left: '10%',
+					text: 'Ctrl loop'
+				}
+			],
 			tooltip: {
 				trigger: 'axis'
 			},
-			xAxis: [{
-				data: times
-			}, {
-				data: times,
-				gridIndex: 1
-			}],
-			yAxis: [{
-				splitLine: {show: false}
-			}, {
-				splitLine: {show: false},
-				gridIndex: 1
-			}],
-			grid: [{
-				bottom: '60%'
-			}, {
-				top: '60%'
-			}],
-			series: [{
-				type: 'line',
-				showSymbol: false,
-				data: transmissionArr
-			}, {
-				type: 'line',
-				showSymbol: false,
-				data: cycleArr,
-				xAxisIndex: 1,
-				yAxisIndex: 1
-			}]
+			legend: {
+				data:['physical time openil', 'loop generic', 'loop openil']
+			},
+			xAxis: [
+				{
+					data: times
+				},
+				{
+					data: times,
+					gridIndex: 1
+				}
+			],
+			yAxis: [
+				{
+					splitLine: {show: false},
+					axisLabel: {
+						formatter: '{value} μs'
+					}
+				},
+				{
+					splitLine: {show: false},
+					axisLabel: {
+						formatter: '{value} μs'
+					},
+					gridIndex: 1
+				}
+			],
+			grid: [
+				{x: '20%', y: '7%', width: '60%', height: '38%'},
+				{x: '20%', y2: '7%', width: '60%', height: '38%'}
+			],
+			series: [
+				/*{
+					name: 'physical time',
+					type: 'line',
+					showSymbol: false,
+					data: transmit_openil,
+					itemStyle : {
+						normal : {
+							color:'#3ca4e0',
+							lineStyle:{
+								color:'#3ca4e0'
+							}
+						}
+					},
+				},*/
+				{
+					name: 'physical time openil',
+					type: 'line',
+					showSymbol: false,
+					data: transmit_generic,
+					itemStyle : {
+						normal : {
+							color:'#e8bc43',
+							lineStyle:{
+								color:'#e8bc43'
+							}
+						}
+					},
+				},
+				{
+					name: 'loop generic',
+					type: 'line',
+					showSymbol: false,
+					data: loop_openil,
+					itemStyle : {
+						normal : {
+							color:'#d4d4d4',
+							lineStyle:{
+								color:'#d4d4d4'
+							}
+						}
+					},
+					xAxisIndex: 1,
+					yAxisIndex: 1
+				},
+				{
+					name: 'loop openil',
+					type: 'line',
+					showSymbol: false,
+					data: loop_generic,
+					itemStyle : {
+						normal : {
+							color:'#00FF00',
+							lineStyle:{
+								color:'#00FF00'
+							}
+						}
+					},
+					xAxisIndex: 1,
+					yAxisIndex: 1
+				}
+
+			]
 		};
 
 		myChart.setOption(option);
 
 		setInterval(function(){
+			if (flag === 0){
+				//return;
+			}
 			$.ajax({
-				url: 'http://10.192.208.166:8000/',
+				url: Url,
 				dataType: 'text',
 				success: function(data) {
 					data = data.replace(/[\r\n]/g, "");
 					var strs = data.split('\t');
 					var strsLen = strs.length;
-					transmission = parseFloat(strs[0], 10);
-					cycle = parseFloat(strs[strsLen - 1], 10);
-					console.log('transmission: ' + transmission + '   cycle: ' + cycle);
+					transmit_openil.push(parseFloat(strs[0], 10));
+					/*transmit_generic.push(parseFloat(strs[1], 10));*/
+					loop_openil.push(parseFloat(strs[2], 10));
+					loop_generic.push(parseFloat(strs[3], 10));
+					console.log(strs);
 				}
 			});
 
-			transmissionArr.push(transmission);
-			cycleArr.push(cycle);
 			if(count >= Y_N){
-				transmissionArr.shift();
-				cycleArr.shift();
+				transmit_openil.shift();
+				/*transmit_generic.shift();*/
+				loop_openil.shift();
+				loop_generic.shift();
 			}
 			count++;
 
 			myChart.setOption({
-			series: [{
-				data: transmissionArr,
-			}, {
-				data: cycleArr,
-			}]
+			series: [
+				{
+					data: transmit_openil,
+				},
+				/*{
+					data: transmit_generic,
+				},*/
+				{
+					data: loop_openil,
+				},
+				{
+					data: loop_generic,
+				},
+
+			]
 
 			});
 
@@ -120,6 +213,11 @@
 		if (option && typeof option === "object") {
 			myChart.setOption(option, true);
 		}
+		function getServerIp(){
+			Url = document.getElementById("IP").value;
+			flag = 1;
+		}
        </script>
+
    </body>
 </html>
