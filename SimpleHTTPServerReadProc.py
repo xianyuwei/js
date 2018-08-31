@@ -25,7 +25,7 @@ igh_proc_file_path = '/proc/ethercat/igh_ec_performance_log'
 save_file_flag = 0
 
 try:
-    save_file = open('1.txt', 'r')
+    save_file = open('save_performance', 'r')
     save_file_flag = 1
 except IOError:
     save_file_flag = 0
@@ -33,8 +33,9 @@ except IOError:
 
 def get_save_file_info():
     if (save_file_flag == 0):
-        return '0\t0\t0\t0'
+        return '0\t0\t0'
     buf = save_file.readline()
+    buf = buf.strip('\n')
     offset = save_file.tell()
 
     tmp_buf = save_file.readline()
@@ -58,7 +59,7 @@ class CORSRequestHandler (SimpleHTTPRequestHandler):
             proc_buf = proc_buf.strip('\n')
             proc_file.close()
         except IOError:
-            proc_file = '0\t0\t0\t0'
+            proc_buf = '0\t0\t0'
             print "proc_file is not accessible."
         buf = proc_buf + '\t' + save_buf
         self.protocal_version = 'HTTP/1.1'

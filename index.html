@@ -28,8 +28,8 @@
 		option = null;
 
 		var times = [];
-		var transmit_openil = [];
-		var transmit_generic = [];
+		var enable_tsn = [];
+		var disable_tsn = [];
 		var loop_openil = [];
 		var loop_generic = [];
 		var performanceAverage = 5;
@@ -52,20 +52,38 @@
 				{
 					left: '10%',
 					top: '2%',
-					text: 'transmission Time'
+					text: 'EtherCAT Line Delay'
 				},
 				{
 					top: '50%',
 					left: '10%',
-					text: 'Ctrl loop'
+					text: 'Control Loop Time'
 				}
 			],
 			tooltip: {
 				trigger: 'axis'
 			},
-			legend: {
-				data:['physical time openil', 'loop generic', 'loop openil']
-			},
+			legend: [
+                {
+                    icon : 'bar',
+                    textStyle : {
+
+                        color : "#B8B6B8"
+                    },
+                    data : ['TSN Enable', 'TSN Disable'],
+					x : '40%',
+                },
+				{
+                    icon : 'bar',
+                    textStyle : {
+
+                        color : "#B8B6B8"
+                    },
+                    data : ['Running in OpenIL', 'Running in Generic Linux'],
+                    x : '40%',
+					top: '50%'
+                }
+            ],
 			xAxis: [
 				{
 					data: times
@@ -87,6 +105,8 @@
 					axisLabel: {
 						formatter: '{value} μs'
 					},
+					//max:250,
+					//min:150,
 					gridIndex: 1
 				}
 			],
@@ -95,11 +115,11 @@
 				{x: '20%', y2: '7%', width: '60%', height: '38%'}
 			],
 			series: [
-				/*{
-					name: 'physical time',
+				{
+					name: 'TSN Enable',
 					type: 'line',
 					showSymbol: false,
-					data: transmit_openil,
+					data: enable_tsn,
 					itemStyle : {
 						normal : {
 							color:'#3ca4e0',
@@ -108,26 +128,12 @@
 							}
 						}
 					},
-				},*/
-				{
-					name: 'physical time openil',
-					type: 'line',
-					showSymbol: false,
-					data: transmit_generic,
-					itemStyle : {
-						normal : {
-							color:'#e8bc43',
-							lineStyle:{
-								color:'#e8bc43'
-							}
-						}
-					},
 				},
 				{
-					name: 'loop generic',
+					name: 'TSN Disable',
 					type: 'line',
 					showSymbol: false,
-					data: loop_openil,
+					data: disable_tsn,
 					itemStyle : {
 						normal : {
 							color:'#d4d4d4',
@@ -136,19 +142,33 @@
 							}
 						}
 					},
-					xAxisIndex: 1,
-					yAxisIndex: 1
 				},
 				{
-					name: 'loop openil',
+					name: 'Running in OpenIL',
 					type: 'line',
 					showSymbol: false,
-					data: loop_generic,
+					data: loop_openil,
 					itemStyle : {
 						normal : {
 							color:'#00FF00',
 							lineStyle:{
 								color:'#00FF00'
+							}
+						}
+					},
+					xAxisIndex: 1,
+					yAxisIndex: 1
+				},
+				{
+					name: 'Running in Generic Linux',
+					type: 'line',
+					showSymbol: false,
+					data: loop_generic,
+					itemStyle : {
+						normal : {
+							color:'#d4d4d4',
+							lineStyle:{
+								color:'#d4d4d4'
 							}
 						}
 					},
@@ -172,17 +192,17 @@
 					data = data.replace(/[\r\n]/g, "");
 					var strs = data.split('\t');
 					var strsLen = strs.length;
-					transmit_openil.push(parseFloat(strs[0], 10));
-					/*transmit_generic.push(parseFloat(strs[1], 10));*/
+					enable_tsn.push(parseFloat(strs[0], 10));
 					loop_openil.push(parseFloat(strs[2], 10));
-					loop_generic.push(parseFloat(strs[3], 10));
+					disable_tsn.push(parseFloat(strs[3], 10));
+					loop_generic.push(parseFloat(strs[5], 10));
 					console.log(strs);
 				}
 			});
 
 			if(count >= Y_N){
-				transmit_openil.shift();
-				/*transmit_generic.shift();*/
+				enable_tsn.shift();
+				disable_tsn.shift();
 				loop_openil.shift();
 				loop_generic.shift();
 			}
@@ -191,11 +211,11 @@
 			myChart.setOption({
 			series: [
 				{
-					data: transmit_openil,
+					data: enable_tsn,
 				},
-				/*{
-					data: transmit_generic,
-				},*/
+				{
+					data: disable_tsn,
+				},
 				{
 					data: loop_openil,
 				},
