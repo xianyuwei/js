@@ -51,11 +51,11 @@
 			title: [
 				{
 					left: '10%',
-					top: '2%',
+					top: '1%',
 					text: 'EtherCAT Line Delay'
 				},
 				{
-					top: '50%',
+					top: '48%',
 					left: '10%',
 					text: 'Control Loop Time'
 				}
@@ -67,17 +67,15 @@
                 {
                     icon : 'bar',
                     textStyle : {
-
-                        color : "#B8B6B8"
+                        color : "#262626"
                     },
-                    data : ['TSN Enable', 'TSN Disable'],
+                    data : ['TSN Enabled', 'TSN Disabled'],
 					x : '40%',
                 },
 				{
                     icon : 'bar',
                     textStyle : {
-
-                        color : "#B8B6B8"
+                        color : "#262626"
                     },
                     data : ['Running in OpenIL', 'Running in Generic Linux'],
                     x : '40%',
@@ -116,7 +114,7 @@
 			],
 			series: [
 				{
-					name: 'TSN Enable',
+					name: 'TSN Enabled',
 					type: 'line',
 					showSymbol: false,
 					data: enable_tsn,
@@ -130,7 +128,7 @@
 					},
 				},
 				{
-					name: 'TSN Disable',
+					name: 'TSN Disabled',
 					type: 'line',
 					showSymbol: false,
 					data: disable_tsn,
@@ -192,9 +190,13 @@
 					data = data.replace(/[\r\n]/g, "");
 					var strs = data.split('\t');
 					var strsLen = strs.length;
-					enable_tsn.push(parseFloat(strs[0], 10));
-					loop_openil.push(parseFloat(strs[2], 10));
-					disable_tsn.push(parseFloat(strs[3], 10));
+					if (parseFloat(strs[0], 10) < 0) {
+						enable_tsn.push(60);
+	       				} else {
+						enable_tsn.push(parseFloat(strs[0], 10) / 1000);
+	       				}
+					loop_openil.push(parseFloat(strs[2], 10) / 1000);
+					disable_tsn.push(parseFloat(strs[3], 10) / 1000);
 					loop_generic.push(parseFloat(strs[5], 10));
 					console.log(strs);
 				}
