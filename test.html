@@ -81,6 +81,22 @@ setInterval(function(){
 if (option && typeof option === "object") {
     myChart.setOption(option, true);
 }
+function post()
+{
+	
+	$.ajax({
+		type: 'POST',
+        url: 'http://10.192.208.166:8000/',
+        dataType: 'text',
+		data:'1234',
+        success: function(data) {
+			console.log('11111111111111');
+        }
+    });
+	console.log('222222222222');
+
+}
+
        </script>
    </body>
 </html>

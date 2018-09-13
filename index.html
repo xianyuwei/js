@@ -7,8 +7,10 @@
    </head>
 
    <body style="height: 100%; margin: 0">
-	<input name="IP" type="text" id="IP" placeholder="Server IP" style="margin-left:10px; height: 22px; background-color:#CCC;"/>
-	<input type="submit" value="Start"  onclick="getServerIp()" style="margin-left:0px; background-color: #7ED321; width:70px;height: 30px;color: #FFFFFF"/>
+	<!--<input name="IP" type="text" id="IP" placeholder="Server IP" style="margin-left:10px; height: 22px; background-color:#CCC;"/>-->
+	<!--<input type="submit" value="Start"  onclick="getServerIp()" style="margin-left:0px; background-color: #7ED321; width:70px;height: 30px;color: #FFFFFF"/>-->
+	<input type="submit" id="TB" value="EnableTSN"  onclick="tsnButton()" style="margin-left:0px; background-color: #7ED321; width:100px;height: 30px;color: #3c78d8"/>
+	<input type="submit" id="BD" value="OpenBD"  onclick="BackgroundDiagram()" style="background-color: #7ED321; width:100px;height: 30px;color: #3c78d8"/>
 
        <div id="container" style="height: 100%"></div>
        <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
@@ -36,6 +38,12 @@
 		var Y_N = 20;
 		var X_MAX = 10;
 		var X_MIN = 0;
+		var ENABLE_TSN = 'EnableTSN';
+		var DISABLE_TSN = 'DisableTSN';
+		var tmpTSNButtonNmae = ENABLE_TSN;
+		var OPEN_BD = 'OpenBD';
+		var CLOSE_BD = 'CloseBD';
+		var tmpDbButtonNmae = OPEN_BD;
 
 		var transmission = 0;
 		var cycle = 0;
@@ -69,7 +77,7 @@
                     textStyle : {
                         color : "#262626"
                     },
-                    data : ['TSN Enabled', 'TSN Disabled'],
+                    data : [tmpTSNButtonNmae, 'TSN Disable'],
 					x : '40%',
                 },
 				{
@@ -114,7 +122,7 @@
 			],
 			series: [
 				{
-					name: 'TSN Enabled',
+					name: tmpTSNButtonNmae,
 					type: 'line',
 					showSymbol: false,
 					data: enable_tsn,
@@ -229,7 +237,7 @@
 
 			});
 
-		}, 500)
+		}, 50000)
 
 		;
 		if (option && typeof option === "object") {
@@ -239,7 +247,59 @@
 			Url = document.getElementById("IP").value;
 			flag = 1;
 		}
-       </script>
+		function tsnButton(){
+			var btnVal = document.getElementById("TB");
+			if (btnVal.value === ENABLE_TSN) {
+				btnVal.value = DISABLE_TSN;
+				tmpTSNButtonNmae = 'opt_EnableTSN';
+				btnVal.style.color = "#FFFFFF";
+			} else {
+				btnVal.value = ENABLE_TSN;
+				tmpTSNButtonNmae = 'opt_DisableTSN';
+				btnVal.style.color = "#3c78d8";
+			}
+			buttonPost(tmpTSNButtonNmae);
+			myChart.setOption({
+				legend: [
+					{
+						data : [tmpTSNButtonNmae, 'TSN Disable'],
+					},
+				],
+				series: [
+					{
+						name: tmpTSNButtonNmae,
+					},
+				]
+			});
+
+
+		}
+		function BackgroundDiagram(){
+			var btnVal=document.getElementById("BD");
+			if (btnVal.value === OPEN_BD) {
+				btnVal.value = CLOSE_BD;
+				btnVal.style.color = "#FFFFFF";
+				tmpDbButtonNmae = 'opt_OpenDB';
+			} else {
+				btnVal.value = OPEN_BD;
+				btnVal.style.color = "#3c78d8";
+				tmpDbButtonNmae = 'opt_CloseDB';
+			}
+			buttonPost(tmpDbButtonNmae);
+		}
+		function buttonPost(option){
+			$.ajax({
+				type: 'POST',
+				url: Url,
+				dataType: 'text',
+				data: option,
+				success: function(data) {
+					console.log(option);
+				}
+			});
+		}
+
+		</script>
 
    </body>
 </html>

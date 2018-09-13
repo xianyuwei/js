@@ -74,7 +74,16 @@ class CORSRequestHandler (SimpleHTTPRequestHandler):
         self.send_header("Welcome", "Contect")         
         self.end_headers()
         datas=self.rfile.read(int(self.headers['content-length']))
-        print datas
+        if (datas == 'opt_OpenDB'):
+            status = os.system('sh ./1.sh')
+        elif (datas == 'opt_CloseDB'):
+            status = os.system('sh ./1.sh')
+        elif (datas == 'opt_EnableTSN'):
+            status = os.system('sh ./1.sh')
+        elif (datas == 'opt_DisableTSN'):
+            status = os.system('sh ./1.sh')
+        else:
+            print 'error input!'
  
  
 
